@@ -56,9 +56,14 @@ void Todo::init()
 
 void Todo::list()
 {
-    for(int i = 1; i < todoList.size()+1; ++i)
-        std::cout << "\e[1m" << i << "\e[0m " << todoList[i-1].text
-        << " " << todoList[i-1].state << "\n";
+    for(int i = 1; i <= todoList.size(); ++i)
+    {
+        std::cout << "\e[1m" << i << "\e[0m ";
+        std::string text = todoList[i-1].text;
+        std::string s = (todoList[i-1].state) ? "\u2713 " + todoList[i-1].text  : "\u2717 " + todoList[i-1].text;
+        std::cout << s << "\n";
+    }
+
 }
 
 void Todo::add(std::vector<std::string> args)
@@ -74,9 +79,7 @@ void Todo::add(std::vector<std::string> args)
 // TODO Check if num in range
 void Todo::rm(std::vector<std::string> args)
 {
-    std::vector<int> nums;
-    std::transform(args.begin(), args.end(), std::back_inserter(nums),
-        [](const std::string& str) { return std::stoi(str); });
+    std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
         todoList.erase(todoList.begin() + j-1);
@@ -85,23 +88,34 @@ void Todo::rm(std::vector<std::string> args)
 // TODO Check if num in range
 void Todo::done(std::vector<std::string> args)
 {
-    std::vector<int> nums;
-    std::transform(args.begin(), args.end(), std::back_inserter(nums),
-        [](const std::string& str) { return std::stoi(str); });
+    std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
         todoList[j-1].state = 1;
 
-    list();
-
 }
 
-std::string strikethrough(const std::string& text)
+void Todo::priority(std::vector<std::string> args)
 {
-    std::string result;
-    for(auto ch : text) {
-        result.append(u8"\u0336");
-        result.push_back(ch);
-    }
-    return result;
+    std::vector<int> nums = argsToInt(args);
+    todoList[nums[0]-1].priority = nums[1];
 }
+
+void Todo::clean()
+{
+    for(int x = 0; x <= todoList.size(); ++x)
+        if(todoList[x].state)
+            todoList.erase(todoList.begin() + x);
+}
+
+
+std::vector<int> Todo::argsToInt(std::vector<std::string> args)
+{
+    std::vector<int> nums;
+    std::transform(args.begin(), args.end(), std::back_inserter(nums),
+        [](const std::string& str) { return std::stoi(str); });
+
+    return nums;
+}
+
+void Todo::purge() { todoList.clear(); }

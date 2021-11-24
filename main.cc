@@ -18,18 +18,16 @@ int main(int argc, char* argv[])
         if(cmd=="sort")
             std::cout << "sort\n";
         if(cmd=="priority")
-            std::cout << "priority\n";
+            todo.priority(args);
         if(cmd=="rm")
             todo.rm(args);
         if(cmd=="clean")
-            std::cout << "clean\n";
+            todo.clean();
         if(cmd=="purge")
-            std::cout << "purge\n";
-
+            todo.purge();
     }
     else
         todo.list();
-
 
     return 0;
 }
