@@ -13,15 +13,23 @@ int main(int argc, char* argv[])
             todo.init();
         if(cmd=="add")
             todo.add(args);
+        if(cmd=="done")
+            todo.done(args);
+        if(cmd=="sort")
+            std::cout << "sort\n";
+        if(cmd=="priority")
+            std::cout << "priority\n";
         if(cmd=="rm")
             todo.rm(args);
-        if(cmd=="list")
-            std::cout << "list\n";
-        if(cmd=="done")
-            std::cout << "done\n";
+        if(cmd=="clean")
+            std::cout << "clean\n";
+        if(cmd=="purge")
+            std::cout << "purge\n";
+
     }
     else
         todo.list();
+
 
     return 0;
 }
