@@ -1,61 +1,47 @@
 #include "todo.hh"
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
 
 struct TodoItem todoItem;
 
 Todo::Todo()
 {
-    readFile();
+    read_file();
 }
 
 Todo::~Todo()
 {
-    saveFile();
+    save_file();
 }
 
-// TODO if file doesnt exists, throw error
-void Todo::readFile()
+void Todo::read_file()
 {
-    std::ifstream f(fname);
+    std::fstream f(fname, std::ios::in);
     std::string ftext;
-    int fpriority;
     bool fstate;
 
-    while(f >> ftext >> fpriority >> fstate)
+    while(f >> ftext >> fstate)
     {
         TodoItem item;
         item.text = ftext;
-        item.priority = fpriority;
         item.state = fstate;
         todoList.push_back(item);
     }
+
     f.close();
 }
 
-void Todo::saveFile()
+void Todo::save_file()
 {
     std::fstream f(fname, std::ios::out | std::ios::trunc);
     for(auto i : todoList)
-        f << i.text << " " << i.priority << " " << i.state << "\n";
+        f << i.text << " " << i.state << "\n";
     f.close();
 }
 
-void Todo::init()
-{
-    std::ofstream f(fname);
-
-    if(!f.good())
-        std::cout << "Done!\n";
-    else
-        std::cout << "Already initialized!\n";
-    f.close();
-}
 
 void Todo::list()
 {
+    std::cout << "Type 'todo help' for the list of commands.\n";
+
     for(int i = 1; i <= todoList.size(); ++i)
     {
         std::cout << "\e[1m" << i << "\e[0m ";
@@ -63,7 +49,6 @@ void Todo::list()
         std::string s = (todoList[i-1].state) ? "\u2713 " + todoList[i-1].text  : "\u2717 " + todoList[i-1].text;
         std::cout << s << "\n";
     }
-
 }
 
 void Todo::add(std::vector<std::string> args)
@@ -76,38 +61,37 @@ void Todo::add(std::vector<std::string> args)
     }
 }
 
-// TODO Check if num in range
 void Todo::rm(std::vector<std::string> args)
 {
     std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
-        todoList.erase(todoList.begin() + j-1);
+        if(todo_in_range(j))
+            todoList.erase(todoList.begin() + j-1);
 }
 
-// TODO Check if num in range
 void Todo::done(std::vector<std::string> args)
 {
     std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
-        todoList[j-1].state = 1;
-
-}
-
-void Todo::priority(std::vector<std::string> args)
-{
-    std::vector<int> nums = argsToInt(args);
-    todoList[nums[0]-1].priority = nums[1];
+        if(todo_in_range(j))
+            todoList[j-1].state = 1;
 }
 
 void Todo::clean()
 {
-    for(int x = 0; x <= todoList.size(); ++x)
-        if(todoList[x].state)
-            todoList.erase(todoList.begin() + x);
+    if(todoList.size() > 0)
+        for(int x = 0; x <= todoList.size(); x++)
+            if(todoList[x].state)
+                todoList.erase(todoList.begin() + x);
 }
 
+
+bool Todo::todo_in_range(int num)
+{
+    return (0 <= num && num <= todoList.size());
+}
 
 std::vector<int> Todo::argsToInt(std::vector<std::string> args)
 {
@@ -119,3 +103,33 @@ std::vector<int> Todo::argsToInt(std::vector<std::string> args)
 }
 
 void Todo::purge() { todoList.clear(); }
+
+void Todo::usage()
+{
+    std::string s =
+        "Usage: todo [COMMAND] [ARGUMENTS]\n"
+        "Simple Todo app written in c++"
+        "Available commands:\n"
+        "   - add [TASK/s]\n"
+        "       adds new task/s\n"
+        "       example: todo add 'do some coding\n"
+        "   - list\n"
+        "       lists all tasks\n"
+        "       example: todo list\n"
+        //"   - sort\n"
+        //"       sorts tasks by completion\n"
+        //"       example: todo sort\n"
+        "   - done [NUMBER]\n"
+        "       marks task as done\n"
+        "       example: todo done 3 4\n"
+        "   - rm [NUMBER]\n"
+        "       removes a task\n"
+        "       example: todo rm 2\n"
+        "   - clean\n"
+        "       removes a completed tasks\n"
+        "       example: todo clean\n"
+        "   - purge\n"
+        "       removes all tasks\n"
+        "       example: todo purge\n";
+    std::cout << s;
+}
