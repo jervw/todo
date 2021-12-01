@@ -4,8 +4,6 @@ Simple and easy to use Todo app written in C++.
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
-
 ```bash
 git clone https://github.com/jervw/todo.git
 cd todo
