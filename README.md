@@ -1,6 +1,6 @@
 # Todo
 
-Foobar is a Python library for dealing with word pluralization.
+Simple and easy to use Todo app written in C++. 
 
 ## Installation
 
