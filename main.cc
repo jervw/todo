@@ -2,23 +2,21 @@
 
 int main(int argc, char* argv[])
 {
-    Todo todo;
-
     if(argc > 1)
     {
-        std::vector<std::string> args(argv + 2, argv + argc);
+        Todo todo(argc, argv);
         std::string cmd = argv[1];
 
         if(cmd=="add")
-            todo.add(args);
-        if(cmd=="list")
+            todo.add();
+        if(cmd=="list" || cmd=="ls")
             todo.list();
         if(cmd=="done")
-            todo.done(args);
+            todo.done();
         if(cmd=="sort")
             std::cout << "sort\n";
         if(cmd=="rm")
-            todo.rm(args);
+            todo.rm();
         if(cmd=="clean")
             todo.clean();
         if(cmd=="purge")
@@ -27,8 +25,7 @@ int main(int argc, char* argv[])
             todo.usage();
     }
     else
-        todo.list();
-
+        std::cout << "Type 'todo help' for the list of commands.\n";
 
     return 0;
 }

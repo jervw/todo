@@ -2,17 +2,27 @@
 
 struct TodoItem todoItem;
 
-Todo::Todo()
+Todo::Todo(int argc, char* argv[])
 {
-    read_file();
+    args = std::vector<std::string>(argv + 2, argv + argc);
+    readFile();
 }
 
 Todo::~Todo()
 {
-    save_file();
+    saveFile();
 }
 
-void Todo::read_file()
+std::vector<int> Todo::argsToInt(std::vector<std::string> args)
+{
+    std::vector<int> nums;
+    std::transform(args.begin(), args.end(), std::back_inserter(nums),
+        [](const std::string& str) { return std::stoi(str); });
+
+    return nums;
+}
+
+void Todo::readFile()
 {
     std::fstream f(fname, std::ios::in);
     std::string ftext;
@@ -29,7 +39,7 @@ void Todo::read_file()
     f.close();
 }
 
-void Todo::save_file()
+void Todo::saveFile()
 {
     std::fstream f(fname, std::ios::out | std::ios::trunc);
     for(auto i : todoList)
@@ -37,21 +47,16 @@ void Todo::save_file()
     f.close();
 }
 
-
 void Todo::list()
 {
-    std::cout << "Type 'todo help' for the list of commands.\n";
-
     for(int i = 1; i <= todoList.size(); ++i)
     {
-        std::cout << "\e[1m" << i << "\e[0m ";
-        std::string text = todoList[i-1].text;
-        std::string s = (todoList[i-1].state) ? "\u2713 " + todoList[i-1].text  : "\u2717 " + todoList[i-1].text;
-        std::cout << s << "\n";
+        std::string numColor = (todoList[i-1].state) ? "\x1B[32m" + std::to_string(i) + " \033[0m"  : "\x1B[31m" + std::to_string(i) + " \033[0m";
+        std::cout << numColor + todoList[i-1].text << std::endl;
     }
 }
 
-void Todo::add(std::vector<std::string> args)
+void Todo::add()
 {
     for(auto i : args)
     {
@@ -61,24 +66,25 @@ void Todo::add(std::vector<std::string> args)
     }
 }
 
-void Todo::rm(std::vector<std::string> args)
+void Todo::rm()
 {
     std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
-        if(todo_in_range(j))
+        if(todoInRange(j))
             todoList.erase(todoList.begin() + j-1);
 }
 
-void Todo::done(std::vector<std::string> args)
+void Todo::done()
 {
     std::vector<int> nums = argsToInt(args);
 
     for(auto j : nums)
-        if(todo_in_range(j))
-            todoList[j-1].state = 1;
+        if(todoInRange(j))
+            todoList[j-1].state = !todoList[j-1].state;
 }
 
+// ! TODO bug with clean (not always cleaning everything)
 void Todo::clean()
 {
     if(todoList.size() > 0)
@@ -88,27 +94,16 @@ void Todo::clean()
 }
 
 
-bool Todo::todo_in_range(int num)
-{
-    return (0 <= num && num <= todoList.size());
-}
-
-std::vector<int> Todo::argsToInt(std::vector<std::string> args)
-{
-    std::vector<int> nums;
-    std::transform(args.begin(), args.end(), std::back_inserter(nums),
-        [](const std::string& str) { return std::stoi(str); });
-
-    return nums;
-}
-
+bool Todo::todoInRange(int num) { return (0 <= num && num <= todoList.size()); }
 void Todo::purge() { todoList.clear(); }
 
+
+// TODO sort
 void Todo::usage()
 {
     std::string s =
         "Usage: todo [COMMAND] [ARGUMENTS]\n"
-        "Simple Todo app written in c++"
+        "Simple Todo app written in C++.\n"
         "Available commands:\n"
         "   - add [TASK/s]\n"
         "       adds new task/s\n"

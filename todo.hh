@@ -14,18 +14,19 @@ struct TodoItem {
 
 class Todo {
 private:
-    const std::string fname = ".todo";
+    const std::string fname = std::getenv("HOME") + std::string("/.todo");
+    std::vector<std::string> args;
     std::vector<TodoItem> todoList;
     std::vector<int> argsToInt(std::vector<std::string> args);
-    void read_file();
-    void save_file();
-    bool todo_in_range(int num);
+    bool todoInRange(int num);
+    void readFile();
+    void saveFile();
 
 public:
-    Todo();
-    void add(std::vector<std::string> args);
-    void rm(std::vector<std::string> args);
-    void done(std::vector<std::string> args);
+    Todo(int argc, char* argv[]);
+    void add();
+    void rm();
+    void done();
     void list();
     void clean();
     void purge();
